@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ESNext",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": false,
+        "sourceMap": false,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "types": [],
+        "rootDir": "./src",
+        "outDir": "./dist",
+    }
+}

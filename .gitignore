@@ -1,0 +1,13 @@
+# build files
+*.js
+dist/*
+
+# node files
+node_modules/
+package-lock.json
+
+# env files
+*/config.json
+
+# vscode files
+.vscode/
