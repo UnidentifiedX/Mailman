@@ -4,6 +4,8 @@ import { ActionRowBuilder, TextInputBuilder } from "@discordjs/builders";
 import { CommandCustomID } from "../../commandCustomID";
 import transporter from "../../mailer/transporter";
 import config from "../../config.json";
+import { GuildEntry } from "../../database/guildEntry";
+import { addGuildToDatabase } from "../../database/dbFunctions";
 
 enum Subcommands {
     Email = "email",
@@ -109,13 +111,12 @@ export const VerifyCommand: Command = {
 
                 transporter.sendMail(mail, async (err, info) => {
                     if (err) {
-                        await interaction.followUp({
+                        await interaction.editReply({
                             embeds: [
                                 new EmbedBuilder()
                                     .setTitle("Error sending email!")
                                     .setDescription(`Please try again later.`)
-                            ],
-                            ephemeral: true
+                            ]
                         })
 
                         console.log(err);
@@ -130,26 +131,24 @@ export const VerifyCommand: Command = {
                             )
                         );
 
-                        await interaction.followUp({
+                        await interaction.editReply({
                             embeds: [
                                 new EmbedBuilder()
                                     .setTitle("Email sent!")
                                     .setDescription(`You should receive an email at **${interaction.fields.getTextInputValue(CommandCustomID.VerificationEmailInput)}**. Please follow the instructions in the email to verify your email address.`)
                             ],
-                            ephemeral: true
                         })
                     }
                 });
             }
             else {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
                             .setTitle("Invalid email address!")
                             .setDescription(`Please enter a valid email address.`)
                             .setColor(Colors.Red)
-                    ],
-                    ephemeral: true
+                    ]
                 })
             }
         }
@@ -162,6 +161,9 @@ export const VerifyCommand: Command = {
                 && code == instance?.code.toString()
                 && interaction.guildId == instance?.guildId
                 && interaction.user.id == instance?.userId) {
+                
+                const guildEntry = new GuildEntry(interaction.guildId, interaction.member.user.id);
+                addGuildToDatabase(guildEntry);
 
                 await interaction.reply({
                     embeds: [
