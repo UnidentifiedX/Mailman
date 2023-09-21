@@ -3,6 +3,7 @@ import config from "./config.json";
 import commandHandler from "./commands/commandHandler";
 import { Commands } from "./commands/commands";
 import modalHandler from "./modals/modalHandler";
+import { initDatabase } from "./database/db";
 
 const token = config.token;
 const client = new Client({
@@ -14,6 +15,9 @@ client.on(Events.ClientReady, () => {
     Commands.forEach(command => {
         client.application?.commands.create(command.data);
     });
+
+    // Initialize database
+    initDatabase();
 
     console.log(`Logged in as ${client.user?.tag}!`);
 });
