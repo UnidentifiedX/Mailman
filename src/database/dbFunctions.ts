@@ -12,9 +12,13 @@ export function addGuildToDatabase(guild: GuildEntry) {
         verifiedMembersArr.push(guild.verifiedMember);
 
         // Update the db
-        db.prepare("UPDATE guilds SET verified_members = ? WHERE guild_id = ?").run(JSON.stringify(verifiedMembersArr), guild.guildId);
+        if (guild.verifiedMember)
+            db.prepare("UPDATE guilds SET verified_members = ? WHERE guild_id = ?").run(JSON.stringify(verifiedMembersArr), guild.guildId);
     } else {
         // Update the db
-        db.prepare("INSERT INTO guilds (guild_id, verified_members) VALUES (?, ?)").run(guild.guildId, JSON.stringify([guild.verifiedMember]));
+        if (guild.verifiedMember)
+            db.prepare("INSERT INTO guilds (guild_id, verified_members) VALUES (?, ?)").run(guild.guildId, JSON.stringify([guild.verifiedMember]));
+        else
+            db.prepare("INSERT INTO guilds (guild_id) VALUES (?)").run(guild.guildId);
     }
 }

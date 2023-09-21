@@ -1,4 +1,4 @@
-import { Client, Colors, EmbedBuilder, ModalBuilder, ModalSubmitInteraction, SlashCommandBuilder, TextInputStyle } from "discord.js";
+import { Client, Colors, EmbedBuilder, ModalBuilder, ModalSubmitInteraction, PermissionFlagsBits, SlashCommandBuilder, TextInputStyle } from "discord.js";
 import { Command } from "../command";
 import { ActionRowBuilder, TextInputBuilder } from "@discordjs/builders";
 import { CommandCustomID } from "../../commandCustomID";
@@ -6,6 +6,9 @@ import transporter from "../../mailer/transporter";
 import config from "../../config.json";
 import { GuildEntry } from "../../database/guildEntry";
 import { addGuildToDatabase } from "../../database/dbFunctions";
+import { noPermissionsError } from "../../errors/noPermissionsErrors";
+import checkSetup from "../setup/checkSetup";
+import { notSetupError } from "../../errors/notSetupErrors";
 
 enum Subcommands {
     Email = "email",
@@ -46,6 +49,11 @@ export const VerifyCommand: Command = {
                 .setDescription("Verify email verification code")
         ),
     execute: async (client: Client, interaction) => {
+        if (!checkSetup(interaction.guild.id)) 
+            return notSetupError(interaction)
+        if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles))
+            return noPermissionsError(interaction)
+
         if (interaction.options.getSubcommand() === Subcommands.Email) {
             await interaction.showModal(
                 new ModalBuilder()
