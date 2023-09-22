@@ -6,9 +6,11 @@ import transporter from "../../mailer/transporter";
 import config from "../../config.json";
 import { GuildEntry } from "../../database/guildEntry";
 import { addGuildToDatabase } from "../../database/dbFunctions";
-import { noPermissionsError } from "../../errors/noPermissionsErrors";
+import { noManageRolesPermissionsError } from "../../errors/noPermissionsErrors";
 import checkSetup from "../setup/checkSetup";
 import { notSetupError } from "../../errors/notSetupErrors";
+import { db, dbStruct } from "../../database/db";
+import { alreadyHasRoleError } from "../../errors/alreadyHasRoleError";
 
 enum Subcommands {
     Email = "email",
@@ -49,10 +51,16 @@ export const VerifyCommand: Command = {
                 .setDescription("Verify email verification code")
         ),
     execute: async (client: Client, interaction) => {
-        if (!checkSetup(interaction.guild.id)) 
+        if (!checkSetup(interaction.guild.id))
             return notSetupError(interaction)
         if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles))
-            return noPermissionsError(interaction)
+            return noManageRolesPermissionsError(interaction)
+        if (interaction.guild.members.cache.find(
+            member => member.id === interaction.user.id)?.roles.cache.find(
+                role => role.id === (db.prepare(`SELECT verified_email_role FROM guilds WHERE guild_id = ?`).get(interaction.guild.id) as dbStruct).verified_email_role
+            )
+        )
+            return alreadyHasRoleError(interaction)
 
         if (interaction.options.getSubcommand() === Subcommands.Email) {
             await interaction.showModal(
@@ -113,7 +121,7 @@ export const VerifyCommand: Command = {
                 const mail = {
                     from: config.sender_email,
                     to: input,
-                    subject: `Verification code for ${interaction.guild?.name}`,
+                    subject: `[${verificationCode}] Verification code for ${interaction.guild?.name}`,
                     text: `Your verification code is ${verificationCode}. \n\n Run the \"/verify code\" command to verify your email address. This code expires in 5 minutes.`
                 }
 
@@ -150,13 +158,14 @@ export const VerifyCommand: Command = {
                 });
             }
             else {
-                await interaction.editReply({
+                await interaction.reply({
                     embeds: [
                         new EmbedBuilder()
                             .setTitle("Invalid email address!")
                             .setDescription(`Please enter a valid email address.`)
                             .setColor(Colors.Red)
-                    ]
+                    ],
+                    ephemeral: true
                 })
             }
         }
@@ -169,9 +178,15 @@ export const VerifyCommand: Command = {
                 && code == instance?.code.toString()
                 && interaction.guildId == instance?.guildId
                 && interaction.user.id == instance?.userId) {
-                
-                const guildEntry = new GuildEntry(interaction.guildId, interaction.member.user.id);
+
+                const guildEntry = new GuildEntry(interaction.guildId);
                 addGuildToDatabase(guildEntry);
+
+                // add role to member
+                const verified_email_role: string = (db.prepare(`SELECT verified_email_role FROM guilds WHERE guild_id = ?`).get(interaction.guildId) as dbStruct).verified_email_role;
+                const role = interaction.guild.roles.cache.find(role => role.id === verified_email_role);
+
+                await interaction.guild.members.cache.find(member => member.id === interaction.user.id)?.roles.add(role);
 
                 await interaction.reply({
                     embeds: [
@@ -184,7 +199,7 @@ export const VerifyCommand: Command = {
 
                 // Remove instance
                 verificationMembers.splice(verificationMembers.indexOf(instance), 1);
-                
+
                 return;
             }
 
@@ -192,7 +207,7 @@ export const VerifyCommand: Command = {
                 embeds: [
                     new EmbedBuilder()
                         .setTitle("Verification code invalid.")
-                        .setDescription(`Please run the \"/verify email\" command again to get a new verification code, or rerun the`)
+                        .setDescription(`Please run the \"/verify email\" command again to get a new verification code, or rerun the \"/verify code\" command to re-enter the verification code.`)
                         .setColor(Colors.Red)
                 ],
                 ephemeral: true
