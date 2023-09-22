@@ -91,7 +91,7 @@ export const SetupCommand: Command = {
                     .setDescription("Mailman has been set up for this server.")
                     .setColor(Colors.Green)
                     .setFooter({
-                        text: "TIP: Feel free to change the name of the roles and channel to whatever you want! Mailman tracks these changes."
+                        text: "TIP: Feel free to change the name of the roles and channels to whatever you want! Mailman tracks these changes."
                     })
             ]
         })

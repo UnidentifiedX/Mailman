@@ -62,7 +62,9 @@ export const VerifyCommand: Command = {
         )
             return alreadyHasRoleError(interaction)
 
-        if (interaction.options.getSubcommand() === Subcommands.Email) {
+        const subcommand = interaction.options.getSubcommand();
+
+        if (subcommand === Subcommands.Email) {
             await interaction.showModal(
                 new ModalBuilder()
                     .setCustomId(CommandCustomID.VerificationEmailModal)
@@ -80,7 +82,7 @@ export const VerifyCommand: Command = {
                     ])
             )
         }
-        else if (interaction.options.getSubcommand() === Subcommands.Code) {
+        else if (subcommand === Subcommands.Code) {
             await interaction.showModal(
                 new ModalBuilder()
                     .setCustomId(CommandCustomID.VerificationCodeModal)
@@ -107,6 +109,24 @@ export const VerifyCommand: Command = {
 
             // https://www.w3resource.com/javascript/form/email-validation.php
             if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(input)) {
+                // Check if domain is in verified domains array
+                const verifiedDomainsArray = JSON.parse((db.prepare(`SELECT allowed_domains FROM guilds WHERE guild_id = ?`).get(interaction.guild.id) as dbStruct).allowed_domains);
+
+                if (verifiedDomainsArray.length > 0 && !verifiedDomainsArray.find((domain: string) => input.includes(domain))) {
+                    await interaction.reply({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setTitle("Invalid email address!")
+                                .setDescription("Your email address is not allowed in this server.")
+                                .setColor(Colors.Red)
+                                .setFooter({ text: "Please contact an admin if you think that this is a mistake." })
+                        ],
+                        ephemeral: true
+                    })
+
+                    return;
+                }
+
                 // Working on it...
                 await interaction.reply({
                     embeds: [
