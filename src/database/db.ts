@@ -9,7 +9,8 @@ export function initDatabase() {
         is_setup INT DEFAULT 0, 
         verified_email_role TEXT DEFAULT NULL, 
         mailman_admin_role TEXT DEFAULT NULL,
-        mailman_logs_channel TEXT DEFAULT NULL)`).run();
+        mailman_logs_channel TEXT DEFAULT NULL,
+        allowed_domains TEXT DEFAULT NULL)`).run();
 }
 
 export interface dbStruct {

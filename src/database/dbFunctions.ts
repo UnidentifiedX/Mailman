@@ -9,5 +9,4 @@ export function addGuildToDatabase(entry: GuildEntry) {
     if (!guild) {
         db.prepare("INSERT INTO guilds (guild_id) VALUES (?)").run(entry.guildId);
     }
-        
 }

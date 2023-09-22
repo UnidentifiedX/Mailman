@@ -51,7 +51,7 @@ export const VerifyCommand: Command = {
                 .setDescription("Verify email verification code")
         ),
     execute: async (client: Client, interaction) => {
-        if (!checkSetup(interaction.guild.id))
+        if (!checkSetup(interaction))
             return notSetupError(interaction)
         if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles))
             return noManageRolesPermissionsError(interaction)
@@ -121,7 +121,7 @@ export const VerifyCommand: Command = {
                 const mail = {
                     from: config.sender_email,
                     to: input,
-                    subject: `[${verificationCode}] Verification code for ${interaction.guild?.name}`,
+                    subject: `Verification code for ${interaction.guild?.name}`,
                     text: `Your verification code is ${verificationCode}. \n\n Run the \"/verify code\" command to verify your email address. This code expires in 5 minutes.`
                 }
 
