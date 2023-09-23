@@ -1,6 +1,7 @@
-# Self-Hosting
+# Mailman
+Open-source Discord bot that allows you to verify and whitelist emails for your Discord server.
 
-Mailman was made to allow anyone to host their own instance of the bot. This allows you to have full control over the bot and its data. Source code is available in the [GitHub repository](https://github.com/UnidentifiedX/Mailman).
+Mailman was made to allow anyone to host their own instance of the bot. This allows you to have full control over the bot and its data.
 
 ### Requirements
 **Node.js 18.18.0 or higher is required.**
