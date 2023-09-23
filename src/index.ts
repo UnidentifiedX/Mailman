@@ -3,7 +3,7 @@ import config from "./config.json";
 import commandHandler from "./commands/commandHandler";
 import { Commands } from "./commands/commands";
 import modalHandler from "./modals/modalHandler";
-import { initDatabase } from "./database/db";
+import { db, initDatabase } from "./database/db";
 import verificationListCleaner from "./commands/verify/verificationListCleaner";
 
 const token = config.token;
@@ -34,6 +34,11 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         modalHandler(client, interaction);
     if (interaction.isChatInputCommand())
         commandHandler(client, interaction);
+});
+
+client.on(Events.GuildDelete, async (guild) => {
+    // Delete guild from database
+    db.prepare("DELETE FROM guilds WHERE guild_id = ?").run(guild.id);
 });
 
 client.login(token);
