@@ -4,8 +4,7 @@ import checkSetup from "./checkSetup";
 import { notSetupError } from "../../errors/notSetupErrors";
 import { noManageRolesPermissionsError } from "../../errors/noPermissionsErrors";
 import { db, dbStruct } from "../../database/db";
-import { addGuildToDatabase } from "../../database/dbFunctions";
-import { GuildEntry } from "../../database/guildEntry";
+import { logServer } from "../../logging/serverLog";
 
 export const SetupCommand: Command = {
     data: new SlashCommandBuilder()
@@ -17,8 +16,6 @@ export const SetupCommand: Command = {
             return noManageRolesPermissionsError(interaction)
         if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels))
             return noManageRolesPermissionsError(interaction)
-
-        addGuildToDatabase(new GuildEntry(interaction.guild.id));
 
         await interaction.reply({
             embeds: [
@@ -95,5 +92,7 @@ export const SetupCommand: Command = {
                     })
             ]
         })
+
+        logServer(interaction, "Setup Complete!", `${interaction.user.username} ran the setup command, setting up Mailman for this server!`)
     }
 }

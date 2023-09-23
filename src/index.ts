@@ -1,10 +1,11 @@
-import { ActivityType, ChatInputCommandInteraction, Client, Events, GatewayIntentBits, Interaction } from "discord.js"
+import { ActivityType, ChannelType, ChatInputCommandInteraction, Client, Colors, EmbedBuilder, Events, GatewayIntentBits, Interaction, PermissionFlagsBits, TextChannel } from "discord.js"
 import config from "./config.json";
 import commandHandler from "./commands/commandHandler";
 import { Commands } from "./commands/commands";
 import modalHandler from "./modals/modalHandler";
 import { db, initDatabase } from "./database/db";
 import verificationListCleaner from "./commands/verify/verificationListCleaner";
+import { addGuildToDatabase } from "./database/dbFunctions";
 
 const token = config.token;
 const client = new Client({
@@ -34,6 +35,25 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         modalHandler(client, interaction);
     if (interaction.isChatInputCommand())
         commandHandler(client, interaction);
+});
+
+client.on(Events.GuildCreate, async (guild) => {
+    // Add guild to database
+    addGuildToDatabase(guild.id);
+
+    // Send welcome message
+    const channel = guild.channels.cache.find(channel => channel.type === ChannelType.GuildText && channel.permissionsFor(guild.members.me)?.has(PermissionFlagsBits.SendMessages))! as TextChannel;
+
+    if(channel) {
+        await channel.send({
+            embeds: [
+                new EmbedBuilder()
+                    .setTitle("Thanks for adding me!")
+                    .setDescription("To get started, run `/setup` to set up the bot for your server.")
+                    .setColor(Colors.White)
+            ]
+        })
+    }
 });
 
 client.on(Events.GuildDelete, async (guild) => {

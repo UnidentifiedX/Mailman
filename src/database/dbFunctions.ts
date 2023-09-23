@@ -1,12 +1,11 @@
 import { db, dbStruct } from "./db";
-import { GuildEntry } from "./guildEntry";
 
-export function addGuildToDatabase(entry: GuildEntry) {
+export function addGuildToDatabase(id: string) {
     // get the verified_members column from the guilds table
-    const guild: dbStruct = db.prepare("SELECT * FROM guilds WHERE guild_id = ?").get(entry.guildId);
+    const guild: dbStruct = db.prepare("SELECT * FROM guilds WHERE guild_id = ?").get(id);
 
     // check if the guild exists in the database
     if (!guild) {
-        db.prepare("INSERT INTO guilds (guild_id) VALUES (?)").run(entry.guildId);
+        db.prepare("INSERT INTO guilds (guild_id) VALUES (?)").run(id);
     }
 }

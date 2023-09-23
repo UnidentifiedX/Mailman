@@ -4,13 +4,12 @@ import { ActionRowBuilder, TextInputBuilder } from "@discordjs/builders";
 import { CommandCustomID } from "../../commandCustomID";
 import transporter from "../../mailer/transporter";
 import config from "../../config.json";
-import { GuildEntry } from "../../database/guildEntry";
-import { addGuildToDatabase } from "../../database/dbFunctions";
 import { noManageRolesPermissionsError } from "../../errors/noPermissionsErrors";
 import checkSetup from "../setup/checkSetup";
 import { notSetupError } from "../../errors/notSetupErrors";
 import { db, dbStruct } from "../../database/db";
 import { alreadyHasRoleError } from "../../errors/alreadyHasRoleError";
+import { logServer } from "../../logging/serverLog";
 
 enum Subcommands {
     Email = "email",
@@ -199,9 +198,6 @@ export const VerifyCommand: Command = {
                 && interaction.guildId == instance?.guildId
                 && interaction.user.id == instance?.userId) {
 
-                const guildEntry = new GuildEntry(interaction.guildId);
-                addGuildToDatabase(guildEntry);
-
                 // add role to member
                 const verified_email_role: string = (db.prepare(`SELECT verified_email_role FROM guilds WHERE guild_id = ?`).get(interaction.guildId) as dbStruct).verified_email_role;
                 const role = interaction.guild.roles.cache.find(role => role.id === verified_email_role);
@@ -219,6 +215,8 @@ export const VerifyCommand: Command = {
 
                 // Remove instance
                 verificationMembers.splice(verificationMembers.indexOf(instance), 1);
+
+                logServer(interaction, "Email verified", `${interaction.user.tag} has verified their email address!`)
 
                 return;
             }

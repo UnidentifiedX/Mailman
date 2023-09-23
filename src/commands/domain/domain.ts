@@ -3,9 +3,9 @@ import { Command } from "../command";
 import checkSetup from "../setup/checkSetup";
 import { notSetupError } from "../../errors/notSetupErrors";
 import { addGuildToDatabase } from "../../database/dbFunctions";
-import { GuildEntry } from "../../database/guildEntry";
 import { db, dbStruct } from "../../database/db";
 import { noAdminRoleError } from "../../errors/noRoleErrors";
+import { logServer } from "../../logging/serverLog";
 
 enum Subcommands {
     Add = "add",
@@ -17,8 +17,6 @@ enum Subcommands {
 
 function updateExistingDomains(interaction: ChatInputCommandInteraction, domain: string): boolean {
     const guildId = interaction.guild.id;
-
-    addGuildToDatabase(new GuildEntry(interaction.guild.id));
 
     // retrieve domain list
     let domains: string[] = JSON.parse((db.prepare(`SELECT allowed_domains FROM guilds WHERE guild_id = ?`).get(guildId) as dbStruct).allowed_domains);
@@ -133,6 +131,9 @@ export const DomainCommand: Command = {
                         ],
                         ephemeral: true
                     })
+
+                    // Log to server
+                    logServer(interaction, "Domain Added", `${interaction.user.username} added the domain \`${domain}\` to the allowed domains list`)
                 }
             } 
             else {
