@@ -52,7 +52,9 @@ client.on(Events.GuildCreate, async (guild) => {
                     .setDescription("To get started, run `/setup` to set up the bot for your server.")
                     .setColor(Colors.White)
             ]
-        })
+        }).catch(() => {
+            console.log(`Couldn't send welcome message in ${guild.name}.`);
+        });
     }
 });
 
