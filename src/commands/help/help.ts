@@ -20,6 +20,7 @@ export const HelpCommand: Command = {
             embeds: [
                 new EmbedBuilder()
                     .setTitle("Help")
+                    .setURL("https://unidentifiedx.github.io/Mailman/")
                     .setDescription("Available commands")
                     .addFields(commandField)
             ],
