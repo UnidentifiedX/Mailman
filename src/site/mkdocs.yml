@@ -1,0 +1,41 @@
+site_name: Mailman Documentation
+
+repo_url: https://github.com/UnidentifiedX/Mailman
+repo_name: UnidentifiedX/Mailman
+
+theme:
+  name: material
+  logo: ./assets/logo_transparent.png
+  language: en
+  favicon: ./assets/logo.png
+  features:
+    - navigation.tabs
+    - navigation.instant
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night 
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra:
+  alternate:
+    - name: English
+      link: .
+      lang: en
+
+plugins:
+  - search
+  - awesome-pages
+
+copyright: Copyright &copy; 2023 UnidentifiedX
