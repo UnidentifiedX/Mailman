@@ -6,6 +6,9 @@ on:
       - main
 permissions:
   contents: write
+defaults:
+  run:
+    working-directory: ./src/site
 jobs:
   deploy:
     runs-on: ubuntu-latest
