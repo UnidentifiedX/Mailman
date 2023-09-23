@@ -40,7 +40,7 @@ function AddMinutesToDate(minutes: number) {
 export const VerifyCommand: Command = {
     data: new SlashCommandBuilder()
         .setName("verify")
-        .setDescription("Verify your email to get access to the server.")
+        .setDescription("Email verification commands")
         .addSubcommand(subcommand =>
             subcommand
                 .setName(Subcommands.Email)
