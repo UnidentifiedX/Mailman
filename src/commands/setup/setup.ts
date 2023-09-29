@@ -2,7 +2,7 @@ import { ChannelType, Client, Colors, EmbedBuilder, PermissionFlagsBits, SlashCo
 import { Command } from "../command";
 import checkSetup from "./checkSetup";
 import { notSetupError } from "../../errors/notSetupErrors";
-import { noManageRolesPermissionsError } from "../../errors/noPermissionsErrors";
+import { noManageChannelsPermissionsError, noManageRolesPermissionsError } from "../../errors/noPermissionsErrors";
 import { db, dbStruct } from "../../database/db";
 import { logServer } from "../../logging/serverLog";
 
@@ -15,7 +15,7 @@ export const SetupCommand: Command = {
         if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles))
             return noManageRolesPermissionsError(interaction)
         if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels))
-            return noManageRolesPermissionsError(interaction)
+            return noManageChannelsPermissionsError(interaction)
 
         await interaction.reply({
             embeds: [
