@@ -6,6 +6,7 @@ import modalHandler from "./modals/modalHandler";
 import { db, initDatabase } from "./database/db";
 import verificationListCleaner from "./commands/verify/verificationListCleaner";
 import { addGuildToDatabase } from "./database/dbFunctions";
+import topggUpdater from "./utils/topgg";
 
 const token = config.token;
 const client = new Client({
@@ -27,10 +28,18 @@ client.on(Events.ClientReady, () => {
     // Set up activity
     client.user?.setActivity("your emails", { type: ActivityType.Listening });
 
-    console.log(`Logged in as ${client.user?.tag}!`);
+    // Set up topgg stats updater
+    setInterval(() => {
+        topggUpdater(client);
+    }, 8.64e+7);
+
+    console.log(`[BOT] Logged in as ${client.user?.tag}!`);
 });
 
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {
+    // Ignore interaction in DMs
+    if (interaction.channel.type != ChannelType.GuildText) return;
+
     if (interaction.isModalSubmit())
         modalHandler(client, interaction);
     if (interaction.isChatInputCommand())
@@ -55,6 +64,8 @@ client.on(Events.GuildCreate, async (guild) => {
         }).catch(() => {
             console.log(`Couldn't send welcome message in ${guild.name}.`);
         });
+
+        console.log(`[BOT] Added to ${guild.name}`)
     }
 });
 

@@ -28,7 +28,8 @@ Mailman was made to allow anyone to host their own instance of the bot. This all
 {
     "token": "your-bot-token-here",
     "sender_email": "your-email-here",
-    "sender_password": "your-email-password-here"
+    "sender_password": "your-email-password-here",
+    "topgg_token": "your-topgg-token-here (leave blank if you don't need to update topgg stats)"
 }
 ```
 <sup><sub>Currently, only Gmail is supported.</sub></sup>
